@@ -1,5 +1,9 @@
 **Atelier Eco Drive**
 
+Pour que le projet fonctionne, mettez le port de mongodb à 27018
+
+On utilises ici la base de donnée eco_drive_db
+
 *Partie 1 : Modélisation Avancée (1h)*
 
 Objectif : Concevoir une structure hybride (Imbrication vs Référence).
