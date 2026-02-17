@@ -1,5 +1,5 @@
 // part 1
-db.vehicules.insertOne({
+db.vehicles.insertOne({
     brand: "Citroën", 
     model: "C3", 
     registration: "MD-674-CD", 
@@ -27,7 +27,7 @@ db.vehicules.insertOne({
 db.users.insertOne({
     name: "Jean-michel BARREAU",
     age: 47,
-    vehicule_id: ObjectId('69942a0391610d8a868ce5b0') // insert your vehicule id
+    vehicle_id: ObjectId('699443950475e74c5b8ce5b4') // insert your vehicule id
 });
 
 // part 2
@@ -39,7 +39,7 @@ sans avoir de colonnes vides ?
 On imbrique le model, elle va pouvoir varier pour chaque véhicule
 */
 
-db.vehicules.insertOne({
+db.vehicles.insertOne({
     brand: "Peugeot", 
     model: {
         name: "SUV E-208",
@@ -57,7 +57,7 @@ db.vehicules.insertOne({
     incident_history: []
 });
 
-db.vehicules.insertOne({
+db.vehicles.insertOne({
     brand: "Tesla", 
     model: {
         name: "Model Y",
@@ -74,4 +74,86 @@ db.vehicules.insertOne({
         battery_level: 99
     },
     incident_history: []
+});
+
+db.vehicles.insertOne({
+    brand: "Tesla", 
+    model: {
+        name: "Model Y",
+        autonomy: 657,
+        engine_power: 156,
+        auto_pilot: true
+    }, 
+    registration: "DD-634-CS", 
+    telemetry: {
+        last_position: {
+            latitude: 21.516592,
+            longitude: 0.646377
+        },
+        battery_level: 12
+    },
+    incident_history: []
+});
+
+db.vehicles.insertOne({
+    brand: "Volkswagen", 
+    model: "Tiguan", 
+    registration: "DD-634-CS", 
+    telemetry: {
+        last_position: {
+            latitude: 21.516592,
+            longitude: 0.646377
+        },
+        battery_level: 14
+    },
+    incident_history: []
+});
+
+db.users.insertOne({
+    name: "Véronique DUPONT",
+    age: 82,
+    vehicle_id: ObjectId('699443bc0475e74c5b8ce5b7')
+});
+
+db.users.insertOne({
+    name: "Jeff HARDY",
+    age: 32,
+    vehicle_id: ObjectId('69944c4f0475e74c5b8ce5b8')
+});
+
+db.vehicles.insertOne({
+    brand: "Tesla", 
+    model: {
+        name: "Model Y",
+        autonomy: 657,
+        engine_power: 156,
+        auto_pilot: true
+    }, 
+    registration: "DD-634-CS", 
+    telemetry: {
+        last_position: {
+            latitude: 21.516592,
+            longitude: 0.646377
+        },
+        battery_level: 12
+    },
+    incident_history: [
+        {
+            date: "18/01/2026",
+            type: "moteur",
+            description: "Accrochage avec un autre véhicule"
+        }
+    ]
+});
+
+db.users.insertOne({
+    name: "Jérémy FORT",
+    age: 22,
+    vehicle_id: [ObjectId('6994485a0f38c61f50591f52'), ObjectId('69944e5c0475e74c5b8ce5bc')]
+});
+
+db.users.insertOne({
+    name: "Papa de Jérémy",
+    age: 48,
+    vehicle_id: [ObjectId('699453e80475e74c5b8ce5c3'), ObjectId('6994485a0f38c61f50591f52'), ObjectId('69944e5c0475e74c5b8ce5bc')]
 });
