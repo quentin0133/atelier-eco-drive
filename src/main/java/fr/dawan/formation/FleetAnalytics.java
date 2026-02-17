@@ -71,8 +71,8 @@ public class FleetAnalytics {
 
         try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27018")) {
             MongoDatabase database = mongoClient.getDatabase("eco_drive_db");
-            MongoCollection<Document> vehiculeCollection = database.getCollection("vehicles");
-            fleetAnalytics = new FleetAnalytics(vehiculeCollection);
+            MongoCollection<Document> vehicleCollection = database.getCollection("vehicles");
+            fleetAnalytics = new FleetAnalytics(vehicleCollection);
 
             log.info("Moyenne de batterie par marque");
             fleetAnalytics.getAverageBatteryByBrand().forEach(vehicle -> log.info(vehicle.toString()));

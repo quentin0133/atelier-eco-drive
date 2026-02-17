@@ -6,6 +6,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.BsonDocument;
+import org.bson.BsonObjectId;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -23,14 +25,14 @@ public class VehicleService {
         this.vehicles = vehicles;
     }
 
-    public Document registerVehicle(Vehicule vehicule) {
-        Document lastPos = new Document("latitude", vehicule.getTelemetry().getLatitude())
-            .append("longitude", vehicule.getTelemetry().getLongitude());
+    public void registerVehicle(Vehicle vehicle) {
+        Document lastPos = new Document("latitude", vehicle.getTelemetry().getLatitude())
+            .append("longitude", vehicle.getTelemetry().getLongitude());
         Document telemetry = new Document("last_position", lastPos)
-            .append("battery_level", vehicule.getTelemetry().getBatteryLevel());
+            .append("battery_level", vehicle.getTelemetry().getBatteryLevel());
 
         List<Document> incidentHistories = new ArrayList<>();
-        for (Incident incident : vehicule.getIncidentHistories()) {
+        for (Incident incident : vehicle.getIncidentHistories()) {
             incidentHistories.add(
                 new Document("date", incident.getDate())
                     .append("type", incident.getType())
@@ -38,16 +40,13 @@ public class VehicleService {
             );
         }
 
-        Document vehicle = new Document("brand", vehicule.getBrand())
-            .append("model", vehicule.getModel())
-            .append("registration", vehicule.getRegistration())
+        Document vehicleDocument = new Document("brand", vehicle.getBrand())
+            .append("model", new Document("name", vehicle.getModel().getName()))
+            .append("registration", vehicle.getRegistration())
             .append("telemetry", telemetry)
             .append("incident_history", incidentHistories);
 
-        ObjectId vehiculeId = vehicles.insertOne(vehicle).getInsertedId().asObjectId().getValue();
-        vehicle.append("_id", vehiculeId);
-
-        return vehicle;
+        vehicles.insertOne(vehicleDocument).getInsertedId();
     }
 
     public boolean updateTelemetry(String registration, Telemetry telemetry) {
@@ -75,7 +74,7 @@ public class VehicleService {
 
     public List<Document> getLowBatteryVehicle() {
         return vehicles.find(
-            and(lt("telemetry.battery_level", 20), exists("incident_history.3"))
+            and(lt("telemetry.battery_level", 20), exists("incident_history.1"))
         ).into(new ArrayList<>());
     }
 
@@ -84,27 +83,27 @@ public class VehicleService {
 
         try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27018")) {
             MongoDatabase database = mongoClient.getDatabase("eco_drive_db");
-            MongoCollection<Document> vehiculeCollection = database.getCollection("vehicles");
-            vehicleService = new VehicleService(vehiculeCollection);
+            MongoCollection<Document> vehicleCollection = database.getCollection("vehicles");
+            vehicleService = new VehicleService(vehicleCollection);
 
             Telemetry telemetry = new Telemetry();
             telemetry.setLatitude(28.45155d);
             telemetry.setLongitude(1.41541d);
             telemetry.setBatteryLevel(100f);
 
-            Vehicule vehicule = new Vehicule();
-            vehicule.setBrand("Hyundai");
-            vehicule.setModel("Kona");
-            vehicule.setRegistration("CG-781-QA");
-            vehicule.setTelemetry(telemetry);
-            vehicule.setIncidentHistories(List.of(
+            Vehicle vehicle = new Vehicle();
+            vehicle.setBrand("Hyundai");
+            vehicle.setModel(new Model("Kona"));
+            vehicle.setRegistration("CG-781-QA");
+            vehicle.setTelemetry(telemetry);
+            vehicle.setIncidentHistories(List.of(
                 new Incident("18/05/2015", "accident", "Un arbre est tombé sur la voiture"),
                 new Incident("12/12/2012", "panne", "Panne d'électricité"),
                 new Incident("20/01/2020", "vol", "Pierre a volé ma voiture")
             ));
 
-            Document vehiculeDocument = vehicleService.registerVehicle(vehicule);
-            log.info("Véhicule ajouté : {}", vehiculeDocument.toJson());
+            vehicleService.registerVehicle(vehicle);
+            log.info("Véhicule ajouté : {}", vehicle);
 
             Telemetry telemetryUpdate = new Telemetry();
             telemetryUpdate.setLatitude(28.45141d);
@@ -113,17 +112,18 @@ public class VehicleService {
 
             boolean hasUpdated = vehicleService.updateTelemetry("CG-781-QA", telemetryUpdate);
             log.info("Véhicule mis à jour telemetry ? : {}", hasUpdated);
-            log.info("Véhicule : {}", vehiculeCollection.find(eq("registration", "CG-781-QA")).first());
+            log.info("Véhicule : {}", vehicleCollection.find(eq("registration", "CG-781-QA")).first());
 
             Incident incident = new Incident("17/02/2026", "accident", "La voiture s'est pris un poteau");
             boolean hasAddedIncident = vehicleService.reportIncident("CG-781-QA", incident);
             log.info("Véhicule ajouté un incident ? : {}", hasAddedIncident);
-            log.info("Véhicule : {}", vehiculeCollection.find(eq("registration", "CG-781-QA")).first());
+            log.info("Véhicule : {}", vehicleCollection.find(eq("registration", "CG-781-QA")).first());
 
             log.info("Véhicule avec plus de 2 incident et moins de 20% de batterie");
-            vehicleService.getLowBatteryVehicle().forEach(vehicle -> log.info(vehicle.toString()));
+            vehicleService.getLowBatteryVehicle().forEach(v -> log.info(v.toString()));
             log.info("Taille de la liste : {}", vehicleService.getLowBatteryVehicle().size());
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Erreur de connexion : {}", e.getMessage());
         }
     }

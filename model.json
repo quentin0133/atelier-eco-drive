@@ -1,0 +1,30 @@
+{
+  _id: ObjectId('699443ae0475e74c5b8ce5b6'),
+  brand: 'Peugeot',
+  model: {
+    name: 'SUV E-208',
+    autonomy: 433,
+    engine_power: 156
+  },
+  registration: 'MZ-644-CD',
+  telemetry: {
+    last_position: {
+      latitude: 41.416592,,
+      longitude: 1.686377
+    },
+    battery_level: 55
+  },
+  incident_history: [
+    {
+      date: '08/02/2026',
+      type: 'panne',
+      description: 'Le véhicule a perdu sa roue',
+      incident_evidence_id: ObjectId('69947d1f9cf3b57116b6b116')
+    },
+    {
+      date: '18/01/2026',
+      type: 'accident',
+      description: 'Accrochage avec un autre véhicule'
+    }
+  ]
+}
