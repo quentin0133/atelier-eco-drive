@@ -4,12 +4,15 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import javax.print.Doc;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.*;
 
 @Slf4j
@@ -72,5 +75,11 @@ public class VehicleService {
 
     public List<Document> getIncidentHistory(String registration) {
         return vehicles.find(eq("registration", registration)).into(new ArrayList<>());
+    }
+
+    public List<Document> getLowBatteryVehicle() {
+        return vehicles.find(
+            and(lt("telemetry.battery_level", 20), exists("incident_history.3"))
+        ).into(new ArrayList<>());
     }
 }
