@@ -1,10 +1,20 @@
-**Atelier Eco Drive**
+# Atelier Eco Drive
 
-Pour que le projet fonctionne, mettez le port de mongodb à 27018
+Quentin YAHIA - quentin.yahia.pro@gmail.com  
+Hippolyte GAUTHERON - hippolyte.gauth@gmail.com
 
-On utilises ici la base de donnée eco_drive_db
+## Pré-requis
 
-Jeu de donnée :
+- Java 17
+- Maven
+- MongoDB
+
+## Configuration 
+Pour que le projet fonctionne, mettez le port de mongodb à `27018`.  
+On utilises ici la base de donnée `eco_drive_db`
+
+## Jeu de donnée :
+
 ```js
 db.vehicles.insertOne({
     brand: "Tesla", 
